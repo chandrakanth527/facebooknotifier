@@ -1,0 +1,67 @@
+#!/usr/bin/python
+
+import mechanize
+import threading
+import socket
+import sys
+import serial
+
+facebook_email='<facebook_email>'
+password='<password>'
+com_port='COM6'
+baud_rate=4800
+
+def call_facebook():
+    threading.Timer(5.0, call_facebook).start()
+    browser = mechanize.Browser()
+    browser.set_handle_robots(False)
+    cookies = mechanize.CookieJar()
+    browser.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US)     AppleWebKit/534.7 (KHTML, like Gecko) Chrome/7.0.517.41 Safari/534.7')]
+    browser.open("http://m.facebook.com/")
+    browser.select_form(nr=0)
+
+    browser.form['email'] = facebook_email
+    browser.form['pass'] =  password
+    response = browser.submit()
+
+    browser_response=browser.open("http://m.facebook.com/").read()
+
+    friends = browser_response.count("Friends(");
+    if friends == 1:
+       friends_flag="0"
+    else:
+        friends_flag="1"
+
+    messages = browser_response.count("Messages(");
+    if messages == 1:
+        messages_flag="0"
+    else:
+        messages_flag="1"
+        
+    notifications = browser_response.count("Notifications(");
+    if notifications == 1:
+        notifications_flag="0"
+    else:
+        notifications_flag="1"
+    if friends == 0 and messages == 0 and notifications ==0:
+        ser = serial.Serial(com_port, baud_rate, timeout=1)
+        ser.write("Y0Z0")
+        ser.close()
+    else:
+        ser = serial.Serial(com_port, baud_rate, timeout=1)
+        ser.write("Y1Z1")
+        ser.close()
+    complete_string="F" + friends_flag + "M" + messages_flag + "N" + notifications_flag
+    print complete_string
+    ser = serial.Serial(com_port, baud_rate, timeout=1)
+    ser.write(complete_string)
+    ser.close()
+
+
+    return;
+
+ser = serial.Serial(com_port, baud_rate, timeout=1)
+ser.write("Y0Z0M1F1N1")
+ser.close()
+call_facebook();
+

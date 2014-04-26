@@ -1,0 +1,87 @@
+#include <reg51.h>
+   sbit friend=P0^0;
+   sbit message=P0^1;
+   sbit notification=P0^2;
+   sbit facebook_logo_1=P0^3;
+   sbit facebook_logo_2=P0^4;
+void main(void){ 
+   unsigned char mybyte;
+   P0=0xFF;  
+   TMOD=0x20; //use Timer 1, mode 2
+   TH1=0xFA; //4800 baud rate
+   SCON=0x50;
+   TR1=1; //start timer
+   while(1)
+   {
+	
+		while(RI==0);
+		mybyte=SBUF;
+		if(mybyte=='F')
+		{	RI=0;
+		    while(RI==0);
+		    mybyte=SBUF;
+			if(mybyte=='1')
+			{
+			friend=1;	
+			}
+			else
+			{
+			friend=0;
+			}
+  		}
+		else if(mybyte=='M')
+		{	RI=0;
+		    while(RI==0);
+		    mybyte=SBUF;
+			if(mybyte=='1')
+			{
+			message=1;	
+			}
+			else
+			{
+			message=0;
+			}
+  		}
+		else if(mybyte=='N')
+		{	RI=0;
+		    while(RI==0);
+		    mybyte=SBUF;
+			if(mybyte=='1')
+			{
+			notification=1;	
+			}
+			else
+			{
+			notification=0;
+			}
+  		}
+		else if(mybyte=='Y')
+		{	RI=0;
+		    while(RI==0);
+		    mybyte=SBUF;
+			if(mybyte=='1')
+			{
+			facebook_logo_1=1;	
+			}
+			else
+			{
+			facebook_logo_1=0;
+			}
+  		}
+		else if(mybyte=='Z')
+		{	RI=0;
+		    while(RI==0);
+		    mybyte=SBUF;
+			if(mybyte=='1')
+			{
+			facebook_logo_2=1;	
+			}
+			else
+			{
+			facebook_logo_2=0;
+			}
+  		}
+
+		RI=0; 
+   }
+}
